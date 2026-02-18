@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: carms-postgres
+    environment:
+      POSTGRES_USER: carms_user
+      POSTGRES_PASSWORD: carms_password
+      POSTGRES_DB: carms_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U carms_user -d carms_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Dagster
+  dagster_webserver:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    container_name: carms-dagster
+    working_dir: /app
+    environment:
+      DAGSTER_HOME: /app
+      DAGSTER_POSTGRES_USER: carms_user
+      DAGSTER_POSTGRES_PASSWORD: carms_password
+      DAGSTER_POSTGRES_DB: carms_db
+      DAGSTER_POSTGRES_HOST: postgres
+    volumes:
+      - ../src:/app/src
+      - ../data:/app/data
+      - ../dagster.yaml:/app/dagster.yaml
+      - ../workspace.yaml:/app/workspace.yaml
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: dagster dev -h 0.0.0.0 -p 3000 -w workspace.yaml
+
+  # FastAPI
+  api:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    container_name: carms-api
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgresql://carms_user:carms_password@postgres:5432/carms_db
+    volumes:
+      - ../src:/app/src
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: uvicorn src.carms.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Streamlit
+  dashboard:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    container_name: carms-dashboard
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgresql://carms_user:carms_password@postgres:5432/carms_db
+      API_URL: http://api:8000
+    volumes:
+      - ../src:/app/src
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_started
+    command: streamlit run src/carms/dashboard/app.py
+
+volumes:
+  postgres_data:
