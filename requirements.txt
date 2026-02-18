@@ -1,0 +1,15 @@
+fastapi>=0.110.0
+uvicorn>=0.27.0
+sqlmodel>=0.0.16
+alembic
+psycopg2-binary
+dagster
+dagster-webserver
+dagster-postgres
+pandas
+openpyxl
+streamlit
+plotly
+pydantic-settings
+python-multipart
+requests
