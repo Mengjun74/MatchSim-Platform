@@ -110,6 +110,15 @@ def explorer_page():
             st.markdown(f"**School:** {detail['school_name']} | **Discipline:** {detail['discipline_name']}")
             if detail.get('url'):
                 st.markdown(f"[View on CaRMS]({detail['url']})")
+            
+            if detail.get('extra_data'):
+                import json
+                try:
+                    meta = json.loads(detail['extra_data'])
+                    with st.expander("Program Metadata"):
+                        st.json(meta)
+                except:
+                    pass
                 
             if detail.get('sections'):
                 for section in detail['sections']:

@@ -65,7 +65,8 @@ def get_programs(
             discipline_id=prog.discipline_id,
             school_id=prog.school_id,
             discipline_name=disc_name,
-            school_name=school_name
+            school_name=school_name,
+            extra_data=prog.extra_data
         )
         response.append(p_read)
         
@@ -94,5 +95,6 @@ def get_program_detail(program_id: int, session: SessionDep):
         school_id=program.school_id,
         discipline_name=disc.name if disc else None,
         school_name=school.name if school else None,
+        extra_data=program.extra_data,
         sections=section_reads
     )

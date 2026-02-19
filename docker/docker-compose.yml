@@ -31,6 +31,7 @@ services:
       DAGSTER_POSTGRES_PASSWORD: carms_password
       DAGSTER_POSTGRES_DB: carms_db
       DAGSTER_POSTGRES_HOST: postgres
+      DATABASE_URL: postgresql://carms_user:carms_password@postgres:5432/carms_db
     volumes:
       - ../src:/app/src
       - ../data:/app/data
@@ -70,7 +71,7 @@ services:
     working_dir: /app
     environment:
       DATABASE_URL: postgresql://carms_user:carms_password@postgres:5432/carms_db
-      API_URL: http://api:8000
+      API_URL: http://api:8000/api/v1
     volumes:
       - ../src:/app/src
     ports:

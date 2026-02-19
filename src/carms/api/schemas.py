@@ -24,6 +24,7 @@ class ProgramRead(BaseModel):
     # Include names for convenience in API
     discipline_name: Optional[str] = None
     school_name: Optional[str] = None
+    extra_data: Optional[str] = None # JSON string
 
 class ProgramDetailRead(ProgramRead):
     sections: List[ProgramSectionRead] = []

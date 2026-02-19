@@ -25,6 +25,7 @@ class ProgramBase(SQLModel):
     url: Optional[str] = None
     discipline_id: Optional[int] = Field(default=None, foreign_key="discipline.id")
     school_id: Optional[int] = Field(default=None, foreign_key="school.id")
+    extra_data: Optional[str] = None # JSON string for extra fields
 
 class Program(ProgramBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
